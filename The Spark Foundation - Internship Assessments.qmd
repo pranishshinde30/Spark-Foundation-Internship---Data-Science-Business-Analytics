@@ -1,0 +1,360 @@
+---
+title: "Spark Foundation Internship - Data Science & Business Analytics"
+author: "Pranish Shinde"
+format: html
+editor: visual
+---
+
+##Q.1 Prediction using Supervised ML
+
+```{r}
+library(openintro)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+# Input the data
+data <- data.frame(
+  Hours = c(2.5, 5.1, 3.2, 8.5, 3.5, 1.5, 9.2, 5.5, 8.3, 2.7, 7.7, 5.9, 4.5, 3.3, 1.1, 8.9, 2.5, 1.9, 6.1, 7.4, 2.7, 4.8, 3.8, 6.9, 7.8),
+  Scores = c(21, 47, 27, 75, 30, 20, 88, 60, 81, 25, 85, 62, 41, 42, 17, 95, 30, 24, 67, 69, 30, 54, 35, 76, 86)
+)
+
+# Plot the data
+ggplot(data, aes(x = Hours, y = Scores)) +
+  geom_point() +
+  labs(title = "Study Hours vs Scores", x = "Hours Studied", y = "Scores")
+
+# Perform linear regression
+model <- lm(Scores ~ Hours, data = data)
+
+# Summary of the model
+summary(model)
+
+# Make predictions
+predicted_scores <- predict(model, newdata = data.frame(Hours = c(5, 10)))
+
+# Print predicted scores
+print(predicted_scores)
+
+# Visualize the regression line
+ggplot(data, aes(x = Hours, y = Scores)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "lightblue") +
+  labs(title = "Study Hours vs Scores with Regression Line", x = "Hours Studied", y = "Scores")
+
+```
+
+##Q.2 Prediction using Unsupervised ML
+
+```{r}
+library(ggplot2)
+library(cluster)
+
+# Load the data from the URL
+url <- "/Users/Administrator/Downloads/Iris.csv"
+iris_data <- read.csv(url)
+
+# View the first few rows and summary of the dataset
+head(iris_data)
+summary(iris_data)
+
+# Removing the species column to focus on clustering
+iris_features <- iris_data[, -6]
+
+# Determine the optimal number of clusters using the Elbow Method
+set.seed(123)
+wcss <- vector()
+for (i in 1:10) wcss[i] <- sum(kmeans(iris_features, i)$withinss)
+plot(1:10, wcss, type = "b", main = "Elbow Method", xlab = "Number of clusters", ylab = "WCSS")
+
+# Determine the optimal number of clusters using the Silhouette Method
+sil_width <- c()
+for (i in 2:10) {
+  km <- kmeans(iris_features, centers = i, nstart = 25)
+  sil <- silhouette(km$cluster, dist(iris_features))
+  sil_width[i] <- mean(sil[, 3])
+}
+plot(1:10, sil_width, type = "b", main = "Silhouette Method", xlab = "Number of clusters", ylab = "Average Silhouette Width")
+
+# Apply K-Means Clustering
+set.seed(123)
+optimal_clusters <- 3 # Assuming 3 is the optimum based on the methods above
+kmeans_result <- kmeans(iris_features, centers = optimal_clusters, nstart = 25)
+iris_data$Cluster <- as.factor(kmeans_result$cluster)
+
+# Visualize the Clusters
+ggplot(iris_data, aes(x = SepalLengthCm, y = SepalWidthCm,fill=Cluster,colour = Cluster)) +
+  geom_point(size = 2) +
+  theme_minimal() +
+  labs(title = "K-Means Clustering of Iris Data", x = "Sepal Length", y = "Sepal Width")
+
+```
+
+##Q.3 Exploratory Data Analysis - Retail
+
+```{r}
+library(ggplot2)
+
+superstore_data <- read.csv("C:/Users/Administrator/Downloads/SampleSuperstore.csv")
+
+# Basic information about the dataset
+str(superstore_data)
+summary(superstore_data)
+
+# View the first few rows of the dataset
+head(superstore_data)
+
+sum(is.na(superstore_data))
+
+
+# Distribution of Sales
+ggplot(superstore_data, aes(x = Sales)) + 
+  geom_histogram(binwidth = 50, fill = "blue", color = "black", alpha = 0.7) +
+  theme_minimal() + labs(title = "Distribution of Sales", x = "Sales", y = "Frequency")
+
+# Distribution of Profit
+ggplot(superstore_data, aes(x = Profit)) + 
+  geom_histogram(binwidth = 50, fill = "green", color = "black", alpha = 0.7) +
+  theme_minimal() + labs(title = "Distribution of Profit", x = "Profit", y = "Frequency")
+
+# Distribution of Discount
+ggplot(superstore_data, aes(x = Discount)) + 
+  geom_histogram(binwidth = 0.1, fill = "red", color = "black", alpha = 0.7) +
+  theme_minimal() + labs(title = "Distribution of Discount", x = "Discount", y = "Frequency")
+
+# Scatterplot of Sales vs. Profit colored by Discount
+ggplot(superstore_data, aes(x = Sales, y = Profit, color = Discount)) + 
+  geom_point(alpha = 0.6) +
+  theme_minimal() + labs(title = "Sales vs. Profit by Discount", x = "Sales", y = "Profit")
+
+# Scatterplot of Discount vs. Profit
+ggplot(superstore_data, aes(x = Discount, y = Profit)) + 
+  geom_point(alpha = 0.6, color = "blue") +
+  theme_minimal() + labs(title = "Discount vs. Profit", x = "Discount", y = "Profit")
+
+# Profit by Region
+ggplot(superstore_data, aes(x = Region, y = Profit, fill = Region)) + 
+  geom_bar(stat = "identity") +
+  theme_minimal() + labs(title = "Profit by Region", x = "Region", y = "Profit")
+
+# Profit by Category
+ggplot(superstore_data, aes(x = Category, y = Profit, fill = Category)) + 
+  geom_bar(stat = "identity") +
+  theme_minimal() + labs(title = "Profit by Category", x = "Category", y = "Profit")
+
+# Profit by Segment
+ggplot(superstore_data, aes(x = Segment, y = Profit, fill = Segment)) + 
+  geom_bar(stat = "identity") +
+  theme_minimal() + labs(title = "Profit by Segment", x = "Segment", y = "Profit")
+
+# State-wise Profit Analysis
+ggplot(superstore_data, aes(x = reorder(State, Profit), y = Profit, fill = State)) + 
+  geom_bar(stat = "identity") +
+  coord_flip() + theme_minimal() +
+  labs(title = "State-Wise Profit", x = "State", y = "Profit")
+
+```
+
+##Q.4 Exploratory Data Analysis - Terrosism
+
+```{r}
+
+# Load the dataset
+terrorism_data <- read_csv('C:/Users/Administrator/Downloads/global_terrorism_database_0718dist.csv')
+
+# Initial Data Exploration
+str(terrorism_data)
+summary(terrorism_data)
+head(terrorism_data)
+
+# Check for missing values
+missing_values <- colSums(is.na(terrorism_data))
+print(missing_values)
+
+# Data Cleaning (Example: Remove or impute missing values)
+# Example: Removing rows with missing values in critical columns
+cleaned_data <- terrorism_data %>%
+  drop_na(nkill)
+
+# Univariate Analysis
+# Example: Distribution of Attack Types
+ggplot(terrorism_data, aes(x = attacktype1_txt)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(title = "Distribution of Attack Types", x = "Attack Type", y = "Count")
+
+# Bivariate Analysis
+# Example: Attack Type vs. Region
+ggplot(terrorism_data, aes(x = region_txt, fill = attacktype1_txt)) +
+  geom_bar(position = "dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(title = "Attack Types by Region", x = "Region", y = "Count")
+
+# Hot Zone Identification
+# Example: Plotting the number of attacks per country
+country_attacks <- terrorism_data %>%
+  group_by(country_txt) %>%
+  summarise(total_attacks = n()) %>%
+  arrange(desc(total_attacks))
+
+ggplot(country_attacks, aes(x = reorder(country_txt, -total_attacks), y = total_attacks)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(title = "Total Attacks by Country", x = "Country", y = "Total Attacks")
+
+# Security Insights
+# Example: Analyzing trends over time
+ggplot(terrorism_data, aes(x = iyear, y = ..count..)) +
+  geom_histogram(binwidth = 1, fill = "blue", color = "black") +
+  labs(title = "Trends in Terrorism Over Time", x = "Year", y = "Number of Attacks")
+
+```
+
+##Q.5 Exploratory Data Analysis - Sports
+
+```{r}
+# Load necessary library
+library(tidyverse)
+library(ggplot2)
+library(readr)
+library(dplyr)
+
+# Unzipping the file and loading the data
+unzip("C:/Users/Administrator/Downloads/Indian Premier League.zip", exdir = "(Archive Root Directory)")
+
+# List the files to see what's inside
+list.files("(Archive Root Directory)")
+
+# Load the relevant CSV files (assuming typical file names, you may need to adjust this)
+matches <- read_csv("C:/Users/Administrator/Downloads/(Archive Root Directory)/matches.csv")
+deliveries <- read_csv("C:/Users/Administrator/Downloads/(Archive Root Directory)/deliveries.csv")
+
+# Explore the structure of the datasets
+str(matches)
+str(deliveries)
+
+# View summaries
+summary(matches)
+summary(deliveries)
+
+# Most successful teams
+team_wins <- matches %>%
+  filter(!is.na(winner)) %>%
+  group_by(winner) %>%
+  summarise(wins = n()) %>%
+  arrange(desc(wins))
+
+# Visualize the most successful teams
+ggplot(team_wins, aes(x = reorder(winner, -wins), y = wins, fill = winner)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Most Successful Teams in IPL", x = "Team", y = "Number of Wins") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Most successful players based on runs scored
+top_scorers <- deliveries %>%
+  group_by(batsman) %>%
+  summarise(total_runs = sum(batsman_runs)) %>%
+  arrange(desc(total_runs)) %>%
+  head(10)
+
+# Visualize top scorers
+ggplot(top_scorers, aes(x = reorder(batsman, -total_runs), y = total_runs, fill = batsman)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Top 10 Batsmen in IPL", x = "Batsman", y = "Total Runs") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Most successful bowlers based on wickets taken
+top_bowlers <- deliveries %>%
+  filter(dismissal_kind %in% c("bowled", "caught", "lbw", "stumped", "caught and bowled", "hit wicket")) %>%
+  group_by(bowler) %>%
+  summarise(total_wickets = n()) %>%
+  arrange(desc(total_wickets)) %>%
+  head(10)
+
+# Visualize top bowlers
+ggplot(top_bowlers, aes(x = reorder(bowler, -total_wickets), y = total_wickets, fill = bowler)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Top 10 Bowlers in IPL", x = "Bowler", y = "Total Wickets") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Impact of Toss on Winning
+toss_win_impact <- matches %>%
+  filter(!is.na(winner)) %>%
+  mutate(toss_match = ifelse(toss_winner == winner, "Toss Win", "Toss Loss")) %>%
+  group_by(toss_match) %>%
+  summarise(wins = n())
+
+# Visualize the impact of toss on winning
+ggplot(toss_win_impact, aes(x = toss_match, y = wins, fill = toss_match)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Impact of Toss on Winning", x = "Toss Outcome", y = "Number of Wins")
+
+# Home vs Away performance
+home_away_performance <- matches %>%
+  filter(!is.na(winner)) %>%
+  mutate(home_team_win = ifelse(city == venue & winner == team1, "Home Win", "Away Win")) %>%
+  group_by(home_team_win) %>%
+  summarise(wins = n())
+
+# Visualize home vs away performance
+ggplot(home_away_performance, aes(x = home_team_win, y = wins, fill = home_team_win)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Home vs Away Performance in IPL", x = "Outcome", y = "Number of Wins")
+
+# Recommend teams for endorsements based on most wins
+recommend_teams <- head(team_wins, 5)
+
+# Recommend players for endorsements based on top scorers and top bowlers
+recommend_players <- bind_rows(
+  top_scorers %>% mutate(type = "Batsman"),
+  top_bowlers %>% mutate(type = "Bowler")
+)
+
+# Display recommendations
+recommend_teams
+recommend_players
+
+
+```
+
+##Q.6 Prediction using Decision Tree Algorithm
+
+```{r}
+# Load necessary libraries
+library(rpart)
+library(rpart.plot)
+library(caret)
+
+# Load the dataset
+url <- "/Users/Administrator/Downloads/Iris.csv"
+iris_data <- read.csv(url)
+iris_data <- read.csv(url, header = TRUE, sep = ",", stringsAsFactors = TRUE, fill = TRUE)
+
+# Explore the dataset
+str(iris_data)
+summary(iris_data)
+
+# Split the dataset into training and testing sets
+set.seed(123)  # For reproducibility
+train_index <- createDataPartition(iris_data$Species, p = 0.7, list = FALSE)
+train_data <- iris_data[train_index, ]
+test_data <- iris_data[-train_index, ]
+
+# Build the Decision Tree model
+model <- rpart(Species ~ ., data = train_data, method = "class")
+
+# Visualize the Decision Tree
+rpart.plot(model, type = 3, extra = 102, fallen.leaves = TRUE, main = "Decision Tree for Iris Dataset")
+
+# Make Predictions on the test data
+predictions <- predict(model, newdata = test_data, type = "class")
+
+# Evaluate the model
+confusionMatrix(predictions, test_data$Species)
+
+```
+

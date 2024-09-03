@@ -1,0 +1,43 @@
+---
+title: "Sparks Foundation Internship - Data Science & Business Analytics"
+author: "Pranish Shinde"
+format: html
+editor: visual
+---
+
+##Q.6 Prediction using Decision Tree Algorithm
+
+```{r}
+# Load necessary libraries
+library(rpart)
+library(rpart.plot)
+library(caret)
+
+# Load the dataset
+url <- "/Users/Administrator/Downloads/Iris.csv"
+iris_data <- read.csv(url)
+iris_data <- read.csv(url, header = TRUE, sep = ",", stringsAsFactors = TRUE, fill = TRUE)
+
+# Explore the dataset
+str(iris_data)
+summary(iris_data)
+
+# Split the dataset into training and testing sets
+set.seed(123)  # For reproducibility
+train_index <- createDataPartition(iris_data$Species, p = 0.7, list = FALSE)
+train_data <- iris_data[train_index, ]
+test_data <- iris_data[-train_index, ]
+
+# Build the Decision Tree model
+model <- rpart(Species ~ ., data = train_data, method = "class")
+
+# Visualize the Decision Tree
+rpart.plot(model, type = 3, extra = 102, fallen.leaves = TRUE, main = "Decision Tree for Iris Dataset")
+
+# Make Predictions on the test data
+predictions <- predict(model, newdata = test_data, type = "class")
+
+# Evaluate the model
+confusionMatrix(predictions, test_data$Species)
+
+```

@@ -1,0 +1,61 @@
+---
+title: "Spark Foundation Internship - Data Science & Business Analytics TASK-4"
+Autuor: Pranish Shinde
+format: html
+editor: visual
+---
+
+##Q.4 Exploratory Data Analysis - Terrosism
+
+```{r}
+
+# Load the dataset
+terrorism_data <- read_csv('C:/Users/Administrator/Downloads/global_terrorism_database_0718dist.csv')
+
+# Initial Data Exploration
+str(terrorism_data)
+summary(terrorism_data)
+head(terrorism_data)
+
+# Check for missing values
+missing_values <- colSums(is.na(terrorism_data))
+print(missing_values)
+
+# Data Cleaning (Example: Remove or impute missing values)
+# Example: Removing rows with missing values in critical columns
+cleaned_data <- terrorism_data %>%
+  drop_na(nkill)
+
+# Univariate Analysis
+# Example: Distribution of Attack Types
+ggplot(terrorism_data, aes(x = attacktype1_txt)) +
+  geom_bar() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(title = "Distribution of Attack Types", x = "Attack Type", y = "Count")
+
+# Bivariate Analysis
+# Example: Attack Type vs. Region
+ggplot(terrorism_data, aes(x = region_txt, fill = attacktype1_txt)) +
+  geom_bar(position = "dodge") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(title = "Attack Types by Region", x = "Region", y = "Count")
+
+# Hot Zone Identification
+# Example: Plotting the number of attacks per country
+country_attacks <- terrorism_data %>%
+  group_by(country_txt) %>%
+  summarise(total_attacks = n()) %>%
+  arrange(desc(total_attacks))
+
+ggplot(country_attacks, aes(x = reorder(country_txt, -total_attacks), y = total_attacks)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  labs(title = "Total Attacks by Country", x = "Country", y = "Total Attacks")
+
+# Security Insights
+# Example: Analyzing trends over time
+ggplot(terrorism_data, aes(x = iyear, y = ..count..)) +
+  geom_histogram(binwidth = 1, fill = "blue", color = "black") +
+  labs(title = "Trends in Terrorism Over Time", x = "Year", y = "Number of Attacks")
+
+```

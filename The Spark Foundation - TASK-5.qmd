@@ -1,0 +1,117 @@
+---
+title: "Spark Foundation Internship - Data Science & Business Analytics TASK-5"
+author: "Pranish Shinde"
+format: html
+editor: visual
+---
+
+##Q.5 Exploratory Data Analysis - Sports
+
+```{r}
+# Load necessary library
+library(tidyverse)
+library(ggplot2)
+library(readr)
+library(dplyr)
+
+# Unzipping the file and loading the data
+unzip("C:/Users/Administrator/Downloads/Indian Premier League.zip", exdir = "(Archive Root Directory)")
+
+# List the files to see what's inside
+list.files("(Archive Root Directory)")
+
+# Load the relevant CSV files (assuming typical file names, you may need to adjust this)
+matches <- read_csv("C:/Users/Administrator/Downloads/(Archive Root Directory)/matches.csv")
+deliveries <- read_csv("C:/Users/Administrator/Downloads/(Archive Root Directory)/deliveries.csv")
+
+# Explore the structure of the datasets
+str(matches)
+str(deliveries)
+
+# View summaries
+summary(matches)
+summary(deliveries)
+
+# Most successful teams
+team_wins <- matches %>%
+  filter(!is.na(winner)) %>%
+  group_by(winner) %>%
+  summarise(wins = n()) %>%
+  arrange(desc(wins))
+
+# Visualize the most successful teams
+ggplot(team_wins, aes(x = reorder(winner, -wins), y = wins, fill = winner)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Most Successful Teams in IPL", x = "Team", y = "Number of Wins") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Most successful players based on runs scored
+top_scorers <- deliveries %>%
+  group_by(batsman) %>%
+  summarise(total_runs = sum(batsman_runs)) %>%
+  arrange(desc(total_runs)) %>%
+  head(10)
+
+# Visualize top scorers
+ggplot(top_scorers, aes(x = reorder(batsman, -total_runs), y = total_runs, fill = batsman)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Top 10 Batsmen in IPL", x = "Batsman", y = "Total Runs") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Most successful bowlers based on wickets taken
+top_bowlers <- deliveries %>%
+  filter(dismissal_kind %in% c("bowled", "caught", "lbw", "stumped", "caught and bowled", "hit wicket")) %>%
+  group_by(bowler) %>%
+  summarise(total_wickets = n()) %>%
+  arrange(desc(total_wickets)) %>%
+  head(10)
+
+# Visualize top bowlers
+ggplot(top_bowlers, aes(x = reorder(bowler, -total_wickets), y = total_wickets, fill = bowler)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Top 10 Bowlers in IPL", x = "Bowler", y = "Total Wickets") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Impact of Toss on Winning
+toss_win_impact <- matches %>%
+  filter(!is.na(winner)) %>%
+  mutate(toss_match = ifelse(toss_winner == winner, "Toss Win", "Toss Loss")) %>%
+  group_by(toss_match) %>%
+  summarise(wins = n())
+
+# Visualize the impact of toss on winning
+ggplot(toss_win_impact, aes(x = toss_match, y = wins, fill = toss_match)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Impact of Toss on Winning", x = "Toss Outcome", y = "Number of Wins")
+
+# Home vs Away performance
+home_away_performance <- matches %>%
+  filter(!is.na(winner)) %>%
+  mutate(home_team_win = ifelse(city == venue & winner == team1, "Home Win", "Away Win")) %>%
+  group_by(home_team_win) %>%
+  summarise(wins = n())
+
+# Visualize home vs away performance
+ggplot(home_away_performance, aes(x = home_team_win, y = wins, fill = home_team_win)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  labs(title = "Home vs Away Performance in IPL", x = "Outcome", y = "Number of Wins")
+
+# Recommend teams for endorsements based on most wins
+recommend_teams <- head(team_wins, 5)
+
+# Recommend players for endorsements based on top scorers and top bowlers
+recommend_players <- bind_rows(
+  top_scorers %>% mutate(type = "Batsman"),
+  top_bowlers %>% mutate(type = "Bowler")
+)
+
+# Display recommendations
+recommend_teams
+recommend_players
+
+```

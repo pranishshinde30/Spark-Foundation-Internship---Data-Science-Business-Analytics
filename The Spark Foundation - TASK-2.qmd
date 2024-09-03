@@ -1,0 +1,51 @@
+---
+title: "Spark Foundation Internship - Data Science & Business Analytics TASK-2"
+author: "Pranish Shinde"
+format: html
+editor: visual
+---
+
+##Q.2 Prediction using Unsupervised ML
+```{r}
+library(ggplot2)
+library(cluster)
+
+# Load the data from the URL
+url <- "/Users/Administrator/Downloads/Iris.csv"
+iris_data <- read.csv(url)
+
+# View the first few rows and summary of the dataset
+head(iris_data)
+summary(iris_data)
+
+# Removing the species column to focus on clustering
+iris_features <- iris_data[, -6]
+
+# Determine the optimal number of clusters using the Elbow Method
+set.seed(123)
+wcss <- vector()
+for (i in 1:10) wcss[i] <- sum(kmeans(iris_features, i)$withinss)
+plot(1:10, wcss, type = "b", main = "Elbow Method", xlab = "Number of clusters", ylab = "WCSS")
+
+# Determine the optimal number of clusters using the Silhouette Method
+sil_width <- c()
+for (i in 2:10) {
+  km <- kmeans(iris_features, centers = i, nstart = 25)
+  sil <- silhouette(km$cluster, dist(iris_features))
+  sil_width[i] <- mean(sil[, 3])
+}
+plot(1:10, sil_width, type = "b", main = "Silhouette Method", xlab = "Number of clusters", ylab = "Average Silhouette Width")
+
+# Apply K-Means Clustering
+set.seed(123)
+optimal_clusters <- 3 # Assuming 3 is the optimum based on the methods above
+kmeans_result <- kmeans(iris_features, centers = optimal_clusters, nstart = 25)
+iris_data$Cluster <- as.factor(kmeans_result$cluster)
+
+# Visualize the Clusters
+ggplot(iris_data, aes(x = SepalLengthCm, y = SepalWidthCm,fill=Cluster,colour = Cluster)) +
+  geom_point(size = 2) +
+  theme_minimal() +
+  labs(title = "K-Means Clustering of Iris Data", x = "Sepal Length", y = "Sepal Width")
+
+```

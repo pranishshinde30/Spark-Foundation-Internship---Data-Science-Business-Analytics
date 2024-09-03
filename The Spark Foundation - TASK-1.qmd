@@ -1,0 +1,44 @@
+---
+title: "Spark Foundation Internship - Data Science & Business Analytics TASK-1"
+author: "Pranish Shinde"
+format: html
+editor: visual
+---
+
+##Q.1 Prediction using Supervised ML
+
+```{r}
+library(openintro)
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+# Input the data
+data <- data.frame(
+  Hours = c(2.5, 5.1, 3.2, 8.5, 3.5, 1.5, 9.2, 5.5, 8.3, 2.7, 7.7, 5.9, 4.5, 3.3, 1.1, 8.9, 2.5, 1.9, 6.1, 7.4, 2.7, 4.8, 3.8, 6.9, 7.8),
+  Scores = c(21, 47, 27, 75, 30, 20, 88, 60, 81, 25, 85, 62, 41, 42, 17, 95, 30, 24, 67, 69, 30, 54, 35, 76, 86)
+)
+
+# Plot the data
+ggplot(data, aes(x = Hours, y = Scores)) +
+  geom_point() +
+  labs(title = "Study Hours vs Scores", x = "Hours Studied", y = "Scores")
+
+# Perform linear regression
+model <- lm(Scores ~ Hours, data = data)
+
+# Summary of the model
+summary(model)
+
+# Make predictions
+predicted_scores <- predict(model, newdata = data.frame(Hours = c(5, 10)))
+
+# Print predicted scores
+print(predicted_scores)
+
+# Visualize the regression line
+ggplot(data, aes(x = Hours, y = Scores)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, color = "lightblue") +
+  labs(title = "Study Hours vs Scores with Regression Line", x = "Hours Studied", y = "Scores")
+
+```

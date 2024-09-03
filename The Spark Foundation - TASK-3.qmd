@@ -1,0 +1,71 @@
+---
+title: "Spark Foundation Internship - Data Science & Business Analytics TASK-3"
+author: "Pranish Shinde"
+format: html
+editor: visual
+---
+
+##Q.3 Exploratory Data Analysis - Retail
+
+```{r}
+library(ggplot2)
+
+superstore_data <- read.csv("C:/Users/Administrator/Downloads/SampleSuperstore.csv")
+
+# Basic information about the dataset
+str(superstore_data)
+summary(superstore_data)
+
+# View the first few rows of the dataset
+head(superstore_data)
+
+sum(is.na(superstore_data))
+
+
+# Distribution of Sales
+ggplot(superstore_data, aes(x = Sales)) + 
+  geom_histogram(binwidth = 50, fill = "blue", color = "black", alpha = 0.7) +
+  theme_minimal() + labs(title = "Distribution of Sales", x = "Sales", y = "Frequency")
+
+# Distribution of Profit
+ggplot(superstore_data, aes(x = Profit)) + 
+  geom_histogram(binwidth = 50, fill = "green", color = "black", alpha = 0.7) +
+  theme_minimal() + labs(title = "Distribution of Profit", x = "Profit", y = "Frequency")
+
+# Distribution of Discount
+ggplot(superstore_data, aes(x = Discount)) + 
+  geom_histogram(binwidth = 0.1, fill = "red", color = "black", alpha = 0.7) +
+  theme_minimal() + labs(title = "Distribution of Discount", x = "Discount", y = "Frequency")
+
+# Scatterplot of Sales vs. Profit colored by Discount
+ggplot(superstore_data, aes(x = Sales, y = Profit, color = Discount)) + 
+  geom_point(alpha = 0.6) +
+  theme_minimal() + labs(title = "Sales vs. Profit by Discount", x = "Sales", y = "Profit")
+
+# Scatterplot of Discount vs. Profit
+ggplot(superstore_data, aes(x = Discount, y = Profit)) + 
+  geom_point(alpha = 0.6, color = "blue") +
+  theme_minimal() + labs(title = "Discount vs. Profit", x = "Discount", y = "Profit")
+
+# Profit by Region
+ggplot(superstore_data, aes(x = Region, y = Profit, fill = Region)) + 
+  geom_bar(stat = "identity") +
+  theme_minimal() + labs(title = "Profit by Region", x = "Region", y = "Profit")
+
+# Profit by Category
+ggplot(superstore_data, aes(x = Category, y = Profit, fill = Category)) + 
+  geom_bar(stat = "identity") +
+  theme_minimal() + labs(title = "Profit by Category", x = "Category", y = "Profit")
+
+# Profit by Segment
+ggplot(superstore_data, aes(x = Segment, y = Profit, fill = Segment)) + 
+  geom_bar(stat = "identity") +
+  theme_minimal() + labs(title = "Profit by Segment", x = "Segment", y = "Profit")
+
+# State-wise Profit Analysis
+ggplot(superstore_data, aes(x = reorder(State, Profit), y = Profit, fill = State)) + 
+  geom_bar(stat = "identity") +
+  coord_flip() + theme_minimal() +
+  labs(title = "State-Wise Profit", x = "State", y = "Profit")
+
+```
